@@ -4,22 +4,66 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import { ConnectAndSIWE } from "../../components/ConnectAndSIWE";
-import cow from "../../../public/cow.jpg";
-import doge from "../../../public/cow.jpg";
-import pig from "../../../public/cow.jpg";
+
+import aaa from "../../../public/aaa.jpg";
+import bbb from "../../../public/bbb.jpg";
+import ccc from "../../../public/ccc.jpg";
+import ddd from "../../../public/ddd.jpg";
+import eee from "../../../public/eee.jpg";
+import fff from "../../../public/fff.jpg";
+import ggg from "../../../public/ggg.png";
+import hhh from "../../../public/hhh.jpg";
+
+import doge from "../../../public/iii.jpg";
 
 const dummyMemes = [
   {
     id: "1",
-    name: "DogeCoin",
-    image: cow,
-    remixes: [cow, pig, doge, cow],
+    name: "NebulaBit",
+    image: aaa,
+    remixes: [ccc, ddd, eee, fff],
   },
   {
     id: "2",
-    name: "PepeCoin",
-    image: cow,
-    remixes: [cow, pig],
+    name: "QuantumPaw",
+    image: bbb,
+    remixes: [ccc, eee, ccc, hhh],
+  },
+  {
+    id: "3",
+    name: "EchoSphere",
+    image: ccc,
+    remixes: [ccc, ggg, eee, fff],
+  },
+  {
+    id: "4",
+    name: "ZenithChain",
+    image: ddd,
+    remixes: [ccc, ddd, eee, fff],
+  },
+  {
+    id: "5",
+    name: "SolisToken",
+    image: eee,
+    remixes: [ccc, ddd, eee, fff],
+  },
+  {
+    id: "6",
+    name: "AetherSwap",
+    image: fff,
+    remixes: [hhh, ddd, eee, ggg],
+  },
+  {
+    id: "7",
+    name: "NimbusByte",
+    image: ggg,
+    remixes: [eee, ddd, fff, hhh],
+  },
+  {
+    id: "8",
+    name: "VertexPay",
+    image: hhh,
+    remixes: [ccc, ddd, eee, fff],
   },
 ];
 
@@ -75,7 +119,13 @@ export default function MemeDetails({ params }: { params: MemeDetailsParams }) {
           <h2 className="text-xl font-semibold mb-6 mt-6">Remix Images</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {meme.remixes.map((src, i) => (
-              <Image key={i} src={src} alt="image" className="rounded" />
+              <Image
+                style={{ height: "200px", borderRadius: "10px" }}
+                key={i}
+                src={src}
+                alt="image"
+                className="w-full h-auto rounded-md object-cover p-2"
+              />
             ))}
           </div>
         </div>

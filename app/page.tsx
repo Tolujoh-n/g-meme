@@ -7,19 +7,29 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import API_URL from "./config";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import doge from "../public/cow.jpg";
+import aaa from "../public/aaa.jpg";
+import bbb from "../public/bbb.jpg";
+import ccc from "../public/ccc.jpg";
+import ddd from "../public/ddd.jpg";
+import eee from "../public/eee.jpg";
+import fff from "../public/fff.jpg";
+import ggg from "../public/ggg.png";
+import hhh from "../public/hhh.jpg";
 
-type Meme = {
-  _id: string;
-  name: string;
-  description: string;
-  image: string; // Image path or URL
-};
+import doge from "../public/iii.jpg";
+
+const dummyMemes = [
+  { id: "1", name: "NebulaBit", image: aaa },
+  { id: "2", name: "QuantumPaw", image: bbb },
+  { id: "3", name: "EchoSphere", image: ccc },
+  { id: "4", name: "ZenithChain", image: ddd },
+  { id: "5", name: "SolisToken", image: eee },
+  { id: "6", name: "AetherSwap", image: fff },
+  { id: "7", name: "NimbusByte", image: ggg },
+  { id: "8", name: "VertexPay", image: hhh },
+];
 
 export default function Page() {
-  const [memes, setMemes] = useState<Meme[]>([]);
-
   const { setFrameReady, isFrameReady } = useMiniKit();
   const router = useRouter();
 
@@ -27,20 +37,6 @@ export default function Page() {
   const [form, setForm] = useState({ name: "", description: "" });
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-
-  useEffect(() => {
-    const fetchMemes = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/gallery`);
-        const data = await res.json();
-        setMemes(data);
-      } catch (err) {
-        console.error("Failed to load memes", err);
-      }
-    };
-
-    fetchMemes();
-  }, []);
 
   useEffect(() => {
     if (!isFrameReady) setFrameReady();
@@ -108,20 +104,18 @@ export default function Page() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {memes.map((meme) => (
+          {dummyMemes.map((m) => (
             <div
-              key={meme._id}
+              key={m.id}
               className="bg-gray-800 rounded p-2 cursor-pointer hover:scale-105 transition"
-              onClick={() => router.push(`/memes/${meme._id}`)}
+              onClick={() => router.push(`/memes/${m.id}`)}
             >
-              <img
-                src={`${API_URL}/uploads/${meme.image.replace(/^\/+/, "")}`}
-                alt={meme.name}
+              <Image
+                src={m.image}
+                alt={m.name}
                 className="rounded w-full h-48 object-cover"
-                width={300}
-                height={200}
               />
-              <h3 className="mt-2 font-semibold">{meme.name}</h3>
+              <h3 className="mt-2 font-semibold">{m.name}</h3>
               <div className="flex gap-2 mt-2">
                 <button className="flex-1 bg-blue-600 py-1 rounded text-sm">
                   Buy Token
@@ -130,7 +124,7 @@ export default function Page() {
                   className="flex-1 bg-yellow-500 py-1 rounded text-sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/memes/${meme._id}?remix=true`);
+                    router.push(`/memes/${m.id}?remix=true`);
                   }}
                 >
                   Remix
@@ -204,6 +198,20 @@ export default function Page() {
                   disabled={!generatedImage || isGenerating}
                 >
                   Mint Meme
+                </button>
+              </div>
+
+              <div className="flex justify-between">
+                <p>
+                  <b>Token Address: </b>{" "}
+                  0x1234567890abcdef1234567890abcdef12345678
+                </p>
+                <button
+                  className="bg-yellow-600 text-white px-3 py-1 rounded"
+                  onClick={() => setIsUploadOpen(false)}
+                  aria-label="Close"
+                >
+                  Close
                 </button>
               </div>
             </div>
