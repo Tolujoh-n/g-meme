@@ -5,31 +5,85 @@ import { useEffect, useState } from "react";
 import { ConnectAndSIWE } from "./components/ConnectAndSIWE";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import API_URL from "./config";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import doge from "../public/cow.jpg";
 
-const dummyMemes = [
-  { id: "1", name: "DogeCoin", image: doge },
-  { id: "2", name: "PepeCoin", image: doge },
-  { id: "3", name: "ShibaMoon", image: doge },
-  { id: "4", name: "ElonDoge", image: doge },
-  { id: "5", name: "ElonDoge", image: doge },
-  { id: "6", name: "ElonDoge", image: doge },
-  { id: "7", name: "ElonDoge", image: doge },
-  { id: "8", name: "ElonDoge", image: doge },
-];
+type Meme = {
+  _id: string;
+  name: string;
+  description: string;
+  image: string; // Image path or URL
+};
 
 export default function Page() {
+  const [memes, setMemes] = useState<Meme[]>([]);
+
   const { setFrameReady, isFrameReady } = useMiniKit();
   const router = useRouter();
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [form, setForm] = useState({ name: "", description: "" });
-  const [generatedImage, setGeneratedImage] = useState(doge);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    const fetchMemes = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/gallery`);
+        const data = await res.json();
+        setMemes(data);
+      } catch (err) {
+        console.error("Failed to load memes", err);
+      }
+    };
+
+    fetchMemes();
+  }, []);
 
   useEffect(() => {
     if (!isFrameReady) setFrameReady();
   }, [setFrameReady, isFrameReady]);
+
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    setGeneratedImage(null);
+
+    setTimeout(() => {
+      // Simulate image generation after 2 seconds
+      setGeneratedImage("/cow.jpg"); // This can be dynamic later
+      setIsGenerating(false);
+    }, 2000);
+  };
+
+  const handleSubmit = async () => {
+    const payload = {
+      name: form.name,
+      description: form.description,
+      image: generatedImage,
+      galleries: [],
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/gallery/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert("Meme uploaded successfully!");
+        setIsUploadOpen(false);
+        setForm({ name: "", description: "" });
+        setGeneratedImage(null);
+      } else {
+        console.error("Failed to upload meme.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -54,18 +108,20 @@ export default function Page() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {dummyMemes.map((m) => (
+          {memes.map((meme) => (
             <div
-              key={m.id}
+              key={meme._id}
               className="bg-gray-800 rounded p-2 cursor-pointer hover:scale-105 transition"
-              onClick={() => router.push(`/memes/${m.id}`)}
+              onClick={() => router.push(`/memes/${meme._id}`)}
             >
-              <Image
-                src={m.image}
-                alt={m.name}
+              <img
+                src={`${API_URL}/uploads/${meme.image.replace(/^\/+/, "")}`}
+                alt={meme.name}
                 className="rounded w-full h-48 object-cover"
+                width={300}
+                height={200}
               />
-              <h3 className="mt-2 font-semibold">{m.name}</h3>
+              <h3 className="mt-2 font-semibold">{meme.name}</h3>
               <div className="flex gap-2 mt-2">
                 <button className="flex-1 bg-blue-600 py-1 rounded text-sm">
                   Buy Token
@@ -74,7 +130,7 @@ export default function Page() {
                   className="flex-1 bg-yellow-500 py-1 rounded text-sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/memes/${m.id}?remix=true`);
+                    router.push(`/memes/${meme._id}?remix=true`);
                   }}
                 >
                   Remix
@@ -87,6 +143,14 @@ export default function Page() {
         {isUploadOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-gray-900 text-white p-6 border border-gray-300 rounded  w-full ml-2 mr-2 max-w-md">
+              <button
+                className="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl font-bold"
+                onClick={() => setIsUploadOpen(false)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+
               <h2 className="text-xl font-bold mb-4">Upload Meme</h2>
               <input
                 type="text"
@@ -107,21 +171,37 @@ export default function Page() {
                 <b>Example: </b> A cartoonish Bitcoin whale hoarding coins while
                 people chase after it, comedic style.
               </p>
-              <Image
-                src={generatedImage}
-                alt="Generated Meme"
-                className="w-full h-60 object-cover rounded mb-2 mt-4"
-              />
+
+              <div className="w-full h-60 border border-dashed border-gray-500 flex items-center justify-center rounded mb-4 relative">
+                {isGenerating ? (
+                  <span className="text-white text-sm">Loading image...</span>
+                ) : generatedImage ? (
+                  <Image
+                    src={generatedImage}
+                    alt="Generated Meme"
+                    className="w-full h-full object-cover rounded"
+                    width={500}
+                    height={300}
+                  />
+                ) : (
+                  <span className="text-gray-500">
+                    Image will appear here after generation
+                  </span>
+                )}
+              </div>
+
               <div className="flex justify-between">
                 <button
                   className="bg-purple-500 text-white px-3 py-1 rounded"
-                  onClick={() => setGeneratedImage(doge)}
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
                 >
-                  Generate Image
+                  {isGenerating ? "Generating..." : "Generate Image"}
                 </button>
                 <button
                   className="bg-green-600 text-white px-3 py-1 rounded"
-                  onClick={() => setIsUploadOpen(false)}
+                  onClick={handleSubmit}
+                  disabled={!generatedImage || isGenerating}
                 >
                   Mint Meme
                 </button>
