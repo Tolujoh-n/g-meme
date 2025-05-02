@@ -14,6 +14,7 @@ import fff from "../../../public/fff.jpg";
 import ggg from "../../../public/ggg.png";
 import hhh from "../../../public/hhh.jpg";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import doge from "../../../public/iii.jpg";
 
 const dummyMemes = [
